@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>五一节后基金组合降低回撤分析 — 智能投研之星</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --text: #1a1d26;
+    --text2: #5f6b7a;
+    --text3: #9aa3b2;
+    --accent: #1e40af;
+    --accent-l: #eef2ff;
+    --gold: #92400e;
+    --gold-l: #fffbeb;
+    --green: #065f46;
+    --green-l: #ecfdf5;
+    --red: #991b1b;
+    --red-l: #fef2f2;
+    --border: #e4e7ed;
+    --radius: 8px;
+    --radius-sm: 6px;
+    --max-w: 900px;
+    --font: "PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+    --font-mono: "SF Mono","Fira Code","Cascadia Code",monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.72;-webkit-font-smoothing:antialiased}
+  .container{max-width:var(--max-w);margin:0 auto;padding:0 32px}
+  a{color:var(--accent);text-decoration:none}
+
+  /* Nav */
+  .nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);border-bottom:1px solid var(--border)}
+  .nav .container{display:flex;gap:2px;overflow-x:auto;padding:9px 32px}
+  .nav a{font-size:12px;font-weight:500;color:var(--text2);padding:5px 14px;border-radius:5px;white-space:nowrap;transition:.12s}
+  .nav a:hover{color:var(--accent);background:var(--accent-l)}
+
+  /* Hero */
+  .hero{background:var(--surface);border-bottom:1px solid var(--border);padding:64px 0 44px}
+  .hero .kicker{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px}
+  .hero h1{font-size:34px;font-weight:700;line-height:1.3;letter-spacing:-.4px;margin-bottom:12px;max-width:700px;color:var(--text)}
+  .hero .sub{font-size:15px;color:var(--text2);line-height:1.6;max-width:560px;margin-bottom:24px}
+  .hero .meta-row{display:flex;gap:28px;font-size:12px;color:var(--text3);font-weight:500}
+  .hero .meta-row span{display:flex;align-items:center;gap:5px}
+
+  .summary-box{background:var(--accent-l);border:1px solid #c7d2fe;border-radius:var(--radius);padding:20px 24px;max-width:780px;margin-top:20px}
+  .summary-box .s-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--accent);margin-bottom:8px}
+  .summary-box p{font-size:13.5px;color:#374151;line-height:1.75}
+
+  /* Section */
+  .section{padding:48px 0}
+  .section-hd{margin-bottom:28px}
+  .section-hd .sec-num{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+  .section-hd h2{font-size:22px;font-weight:700;letter-spacing:-.2px;margin-bottom:4px;color:var(--text)}
+  .section-hd .desc{font-size:13.5px;color:var(--text2)}
+  .divider{height:1px;background:var(--border);margin:0}
+
+  /* Background */
+  .bg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .bg-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;display:flex;gap:12px;align-items:flex-start}
+  .bg-dot{width:8px;height:8px;border-radius:2px;margin-top:6px;flex-shrink:0}
+  .bg-dot.a{background:var(--accent)}
+  .bg-dot.b{background:var(--gold)}
+  .bg-dot.c{background:var(--green)}
+  .bg-dot.d{background:var(--red)}
+  .bg-item h4{font-size:13px;font-weight:700;margin-bottom:2px}
+  .bg-item p{font-size:12px;color:var(--text2);line-height:1.6}
+
+  /* Skills */
+  .skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .skill-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+  .skill-card .s-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .skill-card .s-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+  .skill-card .s-dot.i{background:var(--accent)}
+  .skill-card .s-dot.g{background:var(--gold)}
+  .skill-card .s-dot.b{background:var(--green)}
+  .skill-card .s-dot.s{background:var(--text3)}
+  .skill-card .s-name{font-size:13px;font-weight:700;line-height:1.3}
+  .skill-card .s-id{font-size:10.5px;font-family:var(--font-mono);color:var(--accent);margin-bottom:8px}
+  .skill-card .s-row{margin-bottom:8px}
+  .skill-card .s-row:last-child{margin-bottom:0}
+  .skill-card .s-lbl{font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+  .skill-card .s-val{font-size:12px;color:var(--text2);line-height:1.55}
+
+  /* Timeline */
+  .tl{position:relative;padding-left:38px}
+  .tl::before{content:'';position:absolute;left:13px;top:6px;bottom:6px;width:1px;background:var(--border)}
+  .tl-step{position:relative;margin-bottom:28px}
+  .tl-step:last-child{margin-bottom:0}
+  .tl-dot{position:absolute;left:-38px;top:2px;width:28px;height:28px;border-radius:50%;border:2px solid var(--accent);background:var(--surface);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:1}
+  .tl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px}
+  .tl-card h4{font-size:14px;font-weight:700;margin-bottom:3px}
+  .tl-badge{display:inline-block;font-size:10px;color:var(--accent);background:var(--accent-l);padding:1px 8px;border-radius:4px;font-weight:600;margin-bottom:8px}
+  .tl-card p{font-size:12.5px;color:var(--text2);line-height:1.7}
+  .tl-note{font-size:11.5px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-style:italic}
+
+  /* Findings */
+  .findings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .find-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;border-left:3px solid var(--accent)}
+  .find-card.warn{border-left-color:var(--gold)}
+  .find-card .f-num{font-size:22px;font-weight:800;color:var(--accent);line-height:1;margin-bottom:6px}
+  .find-card.warn .f-num{color:var(--gold)}
+  .find-card h4{font-size:14px;font-weight:700;margin-bottom:4px}
+  .find-card p{font-size:12.5px;color:var(--text2);line-height:1.6}
+
+  /* Data table */
+  .table-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .table-block table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .table-block thead{background:#f8f9fb}
+  .table-block th{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+  .table-block td{padding:9px 14px;border-bottom:1px solid var(--border);font-variant-numeric:tabular-nums}
+  .table-block tbody tr:last-child td{border-bottom:none}
+  .badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 8px;border-radius:4px}
+  .bd-red{background:var(--red-l);color:var(--red)}
+  .bd-gold{background:var(--gold-l);color:var(--gold)}
+  .bd-blue{background:var(--accent-l);color:var(--accent)}
+  .bd-green{background:var(--green-l);color:var(--green)}
+
+  /* Asset blocks */
+  .asset-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:12px}
+  .asset-block .a-tag{display:inline-block;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:2px 8px;border-radius:3px;margin-bottom:8px}
+  .a-tag.equity{background:var(--accent-l);color:var(--accent)}
+  .a-tag.gold{background:var(--gold-l);color:var(--gold)}
+  .a-tag.bond{background:var(--green-l);color:var(--green)}
+  .a-tag.overseas{background:#f3e8ff;color:#6d28d9}
+  .asset-block h4{font-size:15px;font-weight:700;margin-bottom:4px}
+  .asset-block .a-logic{font-size:12.5px;color:var(--text2);margin-bottom:12px}
+  .asset-block table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .asset-block th{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;padding:7px 10px;text-align:left;border-bottom:2px solid var(--border)}
+  .asset-block td{padding:8px 10px;border-bottom:1px solid var(--border)}
+  .asset-block tbody tr:last-child td{border-bottom:none}
+  .warn-box{background:var(--red-l);border:1px solid #fecaca;border-radius:var(--radius-sm);padding:10px 14px;margin-top:10px;font-size:12px;color:var(--red);font-weight:600;line-height:1.5}
+
+  /* Portfolio */
+  .pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .pf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .pf-hd{padding:18px 20px 14px;text-align:center;border-bottom:1px solid var(--border)}
+  .pf-hd.cons{background:#f0fdf6}
+  .pf-hd.bal{background:#f0f4ff}
+  .pf-hd.agg{background:#fef5f5}
+  .pf-hd .pf-icon{font-size:24px;margin-bottom:5px}
+  .pf-hd h4{font-size:15px;font-weight:700}
+  .pf-hd .pf-sub{font-size:11px;color:var(--text2);font-weight:500;margin-top:2px}
+  .pf-body{padding:16px 20px}
+  .pf-bar{margin-bottom:12px}
+  .pf-bar-stack{display:flex;height:7px;border-radius:3px;overflow:hidden;margin-bottom:6px}
+  .pf-bar-stack div{height:100%}
+  .pf-legend{display:flex;flex-wrap:wrap;gap:8px;font-size:10.5px;font-weight:600;color:var(--text2)}
+  .pf-legend span{display:flex;align-items:center;gap:3px}
+  .pf-legend .ld{width:7px;height:7px;border-radius:1px;display:inline-block}
+  .pf-sec{margin-top:12px}
+  .pf-sec h5{font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+  .pf-sec p{font-size:11.5px;color:var(--text2);line-height:1.6}
+
+  /* Conclusion */
+  .conc-block{background:#111827;color:#f1f5f9;border-radius:var(--radius);padding:32px 36px}
+  .conc-block h3{font-size:18px;font-weight:700;color:#fbbf77;margin-bottom:16px}
+  .conc-block .lead{font-size:14px;color:#cbd5e1;line-height:1.75;margin-bottom:22px}
+  .conc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .conc-item h4{font-size:12.5px;font-weight:700;color:#93bbfd;margin-bottom:4px}
+  .conc-item p{font-size:12.5px;color:#9ca3af;line-height:1.65}
+
+  @media(max-width:768px){
+    .hero h1{font-size:25px}
+    .pf-grid,.findings-grid,.bg-grid,.skill-grid{grid-template-columns:1fr}
+    .conc-grid{grid-template-columns:1fr}
+    .hero{padding:40px 0 32px}
+    .section{padding:36px 0}
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="container">
+  <a href="#hero">首页</a><a href="#bg">背景</a><a href="#skills">Skills</a><a href="#process">流程</a><a href="#data">数据</a><a href="#findings">发现</a><a href="#screening">筛选</a><a href="#portfolios">组合</a><a href="#conclusion">结论</a>
+</div></nav>
+
+<!-- ====== HERO ====== -->
+<header class="hero" id="hero"><div class="container">
+  <div class="kicker">天天基金 SKILLS 社群活动 · 智能投研之星</div>
+  <h1>五一节后，普通投资者如何用基金组合降低回撤？</h1>
+  <p class="sub">基于红利、黄金、债券、宽基指数的多资产配置分析。6 个 Skills 联动，29 次 API 调用，从市场温度到组合落地的完整投研链路。</p>
+  <div class="meta-row">
+    <span>2026 年 5 月 7 日</span>
+    <span>数据源：天天基金 Skills API</span>
+    <span>实时调用 · 非回测</span>
+  </div>
+  <div class="summary-box">
+    <div class="s-label">核心结论</div>
+    <p>当前 A 股主要指数处于历史估值高位（沪深300 PE 分位 99.8%），黄金在历史极值区域波动剧烈（近 1 年回撤 25%+），但债市环境晴好。对普通投资者而言，最合理的策略是以<strong>债券为底（50%+）、红利低波替代部分宽基（PE 仅 8.75）、黄金严控比例（≤15%）</strong>。本文构建了保守 / 稳健 / 进取三套方案，并给出每种方案下的降仓信号。</p>
+  </div>
+</div></header>
+
+<!-- ====== BACKGROUND ====== -->
+<section class="section" id="bg"><div class="container">
+  <div class="section-hd"><div class="sec-num">01 研究背景</div><h2>研究框架</h2><p class="desc">本次参赛作品围绕一个真实的普通投资者困境展开</p></div>
+  <div class="bg-grid">
+    <div class="bg-item"><div class="bg-dot a"></div><div><h4>研究背景</h4><p>五一节后市场面临财报季收尾、政策面窗口、海外联动等多重变量，普通投资者在信息不对称下容易陷入追涨杀跌。</p></div></div>
+    <div class="bg-item"><div class="bg-dot b"></div><div><h4>核心问题</h4><p>假设节后市场波动加大，普通投资者如何通过基金/ETF组合，在控制回撤的前提下参与市场机会？</p></div></div>
+    <div class="bg-item"><div class="bg-dot c"></div><div><h4>目标人群</h4><p>有一笔可投资资金、希望控制回撤、不想频繁操作、想用基金组合实现资产配置的普通投资者。</p></div></div>
+    <div class="bg-item"><div class="bg-dot d"></div><div><h4>研究边界</h4><p>不做收益承诺、不做短线喊单、不预测具体涨跌。聚焦于"配置逻辑"与"推导过程"，非买卖建议。</p></div></div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ====== SKILLS ====== -->
+<section class="section" id="skills"><div class="container">
+  <div class="section-hd"><div class="sec-num">02 工具与方法</div><h2>使用的天天基金 Skills</h2><p class="desc">严格调用 6 个 Skills，共计 29 次 API 请求，每个 Skill 承担明确分工</p></div>
+  <div class="skill-grid">
+    <div class="skill-card">
+      <div class="s-head"><div class="s-dot i"></div><div class="s-name">指数详情查询</div></div>
+      <div class="s-id">FUND_INDEX_INFO</div>
+      <div class="s-row"><div class="s-lbl">用途</div><div class="s-val">获取沪深300 / 中证红利 / 创业板指 / 恒生指数的实时点位、估值分位、行业构成。</div></div>
+      <div class="s-row"><div class="s-lbl">关键输出</div><div class="s-val">沪深300 PE分位 99.8%，中证红利 PE 8.75（虽分位高但绝对值低），恒生 PE 12.27 相对A股折价。</div></div>
+    </div>
+    <div class="skill-card">
+      <div class="s-head"><div class="s-dot g"></div><div class="s-name">黄金行情查询</div></div>
+      <div class="s-id">FUND_HUAAN_GOLD_INFO</div>
+      <div class="s-row"><div class="s-lbl">用途</div><div class="s-val">获取黄金现货 / 期货价格、央行储备变动、CPI 等宏观数据。</div></div>
+      <div class="s-row"><div class="s-lbl">关键输出</div><div class="s-val">Au99.99 报 1,026.94 元/克，央行连续 3 月增持至 7,438 万盎司，CPI 3.3% YoY。</div></div>
+    </div>
+    <div class="skill-card">
+      <div class="s-head"><div class="s-dot b"></div><div class="s-name">债市晴雨表</div></div>
+      <div class="s-id">BOND_MARKET</div>
+      <div class="s-row"><div class="s-lbl">用途</div><div class="s-val">了解利率债和信用债当日行情，判断债市是否适合作为底仓。</div></div>
+      <div class="s-row"><div class="s-lbl">关键输出</div><div class="s-val">整体"晴"，利率债 12红1绿2白，信用债 11红6绿1白。债券价格上涨，环境良好。</div></div>
+    </div>
+    <div class="skill-card">
+      <div class="s-head"><div class="s-dot s"></div><div class="s-name">基金搜索</div></div>
+      <div class="s-id">FUND_SEARCH</div>
+      <div class="s-row"><div class="s-lbl">用途</div><div class="s-val">搜索黄金ETF联接、中短债、沪深300ETF联接、红利低波ETF联接、长债等五类候选基金。</div></div>
+      <div class="s-row"><div class="s-lbl">关键输出</div><div class="s-val">锁定华安黄金(000216)、华泰柏瑞红利低波(007466)、易方达沪深300(110020) 等代表产品。</div></div>
+    </div>
+    <div class="skill-card">
+      <div class="s-head"><div class="s-dot i"></div><div class="s-name">基金信息诊断</div></div>
+      <div class="s-id">FUND_BASE_INFOS</div>
+      <div class="s-row"><div class="s-lbl">用途</div><div class="s-val">对 12 只候选基金逐一调取成立时间、风险等级、收益、最大回撤、波动率、夏普比率。</div></div>
+      <div class="s-row"><div class="s-lbl">关键输出</div><div class="s-val">黄金ETF近1年回撤高达 25%，远超宽基（7%）；中短债回撤仅 0.14%，R2 风险等级。</div></div>
+    </div>
+    <div class="skill-card">
+      <div class="s-head"><div class="s-dot b"></div><div class="s-name">净值历史查询</div></div>
+      <div class="s-id">FUND_NAV_INFO</div>
+      <div class="s-row"><div class="s-lbl">用途</div><div class="s-val">对黄金、红利低波、纯债的净值序列进行交叉验证，确认诊断数据的可靠性。</div></div>
+      <div class="s-row"><div class="s-lbl">关键输出</div><div class="s-val">黄金近 3 月净值从 3.49 降至 3.27（-6.2%），确认短期追高风险。</div></div>
+    </div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ====== PROCESS ====== -->
+<section class="section" id="process"><div class="container">
+  <div class="section-hd"><div class="sec-num">03 研究流程</div><h2>完整推导链路</h2><p class="desc">从"问题"到"答案"的五步推导，每步标注使用的 Skill 与操作逻辑</p></div>
+  <div class="tl">
+    <div class="tl-step"><div class="tl-dot">1</div>
+      <div class="tl-card">
+        <h4>市场环境判断</h4>
+        <div class="tl-badge">FUND_INDEX_INFO ×4 · FUND_HUAAN_GOLD_INFO · BOND_MARKET</div>
+        <p>并行调用 4 个指数 + 黄金 + 债市，获得全市场快照。核心发现：宽基指数 PE 分位全部 &gt;90%（沪深300 99.8%、中证红利 99.2%、恒生 95%），市场不便宜。但债市晴好、央行增持黄金提供防御资产支撑。</p>
+        <div class="tl-note">→ 这个发现直接决定了方向：组合必须以防御资产为主，进攻仓位要严格控制。</div>
+      </div>
+    </div>
+    <div class="tl-step"><div class="tl-dot">2</div>
+      <div class="tl-card">
+        <h4>资产类别筛选</h4>
+        <div class="tl-badge">基于第一步数据 · 人工框架分析五类资产</div>
+        <p>对宽基、红利低波、黄金、债券、港股五类资产逐一评估：估值水平、波动特征、与组合目标的匹配度。判断：债券最适合底仓（回撤&lt;0.5%），红利低波适合替代部分宽基暴露（PE 8.75 vs 14.79），黄金只适合小比例对冲。</p>
+        <div class="tl-note">→ 建立了"估值 – 波动 – 匹配度"三维筛选框架。</div>
+      </div>
+    </div>
+    <div class="tl-step"><div class="tl-dot">3</div>
+      <div class="tl-card">
+        <h4>基金筛选与对比</h4>
+        <div class="tl-badge">FUND_SEARCH ×5 · FUND_BASE_INFOS ×12 · FUND_NAV_INFO ×6</div>
+        <p>搜索定位五类基金候选池，逐一调取诊断数据（规模、成立时间、收益、回撤、波动率、夏普、费率），最后用净值历史交叉验证。标准：成立 ≥3 年、回撤匹配风险偏好、跟踪误差可控。</p>
+        <div class="tl-note">→ 关键发现：黄金ETF回撤 25% 远超预期，纠正了"黄金 = 稳健"的常见误区。</div>
+      </div>
+    </div>
+    <div class="tl-step"><div class="tl-dot">4</div>
+      <div class="tl-card">
+        <h4>组合构建</h4>
+        <div class="tl-badge">基于前三步数据 · 手动构建三套方案</div>
+        <p>按风险偏好分三档：保守型（债券 70%+，目标回撤 &lt;2%）、稳健型（债券 45% + 红利 25% + 宽基 15%，目标回撤 5-8%）、进取型（债券 25% + 权益 60%，目标回撤 &lt;12%）。每套方案设定比例、再平衡规则、降仓信号。</p>
+      </div>
+    </div>
+    <div class="tl-step"><div class="tl-dot">5</div>
+      <div class="tl-card">
+        <h4>得出结论</h4>
+        <div class="tl-badge">综合全部数据 · 回答原始问题</div>
+        <p>明确回答四个核心问题：① 配置思路（债券为底 + 红利为盾 + 宽基为矛 + 黄金为险）；② 底仓资产（中短债 + 红利低波）；③ 增强资产（沪深300≤20%、黄金≤15%、港股≤10%）；④ 追高禁区（黄金高位、近1年涨幅 &gt;50% 的赛道基金、创业板）。</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ====== INDEX DATA ====== -->
+<section class="section" id="data"><div class="container">
+  <div class="section-hd"><div class="sec-num">核心数据</div><h2>主要指数估值一览</h2><p class="desc">FUND_INDEX_INFO 实时获取，截至 2026-05-06</p></div>
+  <div class="table-block">
+    <table>
+      <thead><tr><th>指数</th><th>点位</th><th>YTD</th><th>近1年</th><th>近3年</th><th>PE (TTM)</th><th>PE 十年分位</th><th>PB</th><th>ROE</th></tr></thead>
+      <tbody>
+        <tr><td><strong>沪深300</strong></td><td>4,900.51</td><td style="color:var(--green)">+5.34%</td><td style="color:var(--green)">+28.06%</td><td style="color:var(--green)">+21.42%</td><td>14.79</td><td><span class="badge bd-red">99.83%</span></td><td>1.37</td><td>9.25%</td></tr>
+        <tr><td><strong>中证红利</strong></td><td>5,787.20</td><td style="color:var(--green)">+6.87%</td><td style="color:var(--green)">+9.83%</td><td style="color:var(--green)">+6.21%</td><td>8.75</td><td><span class="badge bd-red">99.17%</span></td><td>0.77</td><td>8.76%</td></tr>
+        <tr><td><strong>创业板指</strong></td><td>—</td><td style="color:var(--green)">+17.95%</td><td style="color:var(--green)">+90.20%</td><td style="color:var(--green)">+66.61%</td><td>45.89</td><td><span class="badge bd-gold">72.70%</span></td><td>6.02</td><td>13.13%</td></tr>
+        <tr><td><strong>恒生指数</strong></td><td>—</td><td style="color:var(--green)">+2.28%</td><td style="color:var(--green)">+15.67%</td><td style="color:var(--green)">+30.75%</td><td>12.27</td><td><span class="badge bd-red">95.02%</span></td><td>1.28</td><td>11.36%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ====== FINDINGS ====== -->
+<section class="section" id="findings"><div class="container">
+  <div class="section-hd"><div class="sec-num">04 关键发现</div><h2>六条核心分析发现</h2><p class="desc">每一条均基于 Skill 数据支撑，非主观判断</p></div>
+  <div class="findings-grid">
+    <div class="find-card"><div class="f-num">01</div><h4>A股主要指数均处于历史估值高位</h4><p>沪深300 PE分位 99.83%、中证红利 99.17%、恒生 95.02%。当前入场安全边际很薄，以控制回撤为目标的组合必须限制权益仓位。</p></div>
+    <div class="find-card"><div class="f-num">02</div><h4>中证红利 PE 绝对值仍有优势</h4><p>PE 8.75 vs 沪深300 的 14.79，PB 0.77 vs 1.37。虽相对自身历史偏贵，但绝对估值远低于宽基，高股息提供下行缓冲。</p></div>
+    <div class="find-card warn"><div class="f-num">03</div><h4>黄金远非"稳健资产"</h4><p>FUND_BASE_INFOS 显示黄金ETF近 1 年最大回撤 25.07%，远超沪深300ETF 的 7.24%。组合中应作对冲工具，非底仓。</p></div>
+    <div class="find-card"><div class="f-num">04</div><h4>债市环境良好，中短债是理想底仓</h4><p>BOND_MARKET 显示债市"晴"，中短债回撤仅 0.14-0.25%，R2 风险。在股贵金高环境下是最稳定的组合基石。</p></div>
+    <div class="find-card"><div class="f-num">05</div><h4>港股相对A股存在明显估值折价</h4><p>恒生 PE 12.27，近 1 年仅涨 15.67%（沪深300 涨 28%）。作为跨境分散手段，5-10% 小比例配置合理。</p></div>
+    <div class="find-card"><div class="f-num">06</div><h4>头部宽基产品高度同质化</h4><p>易方达、华夏、华泰柏瑞沪深300ETF近 1 年收益差距 &lt;0.2%，回撤差距 &lt;0.3%。无需纠结选哪家，选费率低的即可。</p></div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ====== SCREENING ====== -->
+<section class="section" id="screening"><div class="container">
+  <div class="section-hd"><div class="sec-num">05 基金筛选</div><h2>五类资产基金筛选结果</h2><p class="desc">FUND_SEARCH 定位候选池 + FUND_BASE_INFOS 逐一诊断</p></div>
+
+  <div class="asset-block">
+    <span class="a-tag equity">宽基指数</span>
+    <h4>沪深300 ETF联接</h4>
+    <p class="a-logic">筛选逻辑：规模大、成立 &gt;10 年、费率低、跟踪误差小。头部三家产品几乎无差异。</p>
+    <table><thead><tr><th>基金名称</th><th>代码</th><th>成立年份</th><th>风险</th><th>近1年回撤</th><th>评价</th></tr></thead>
+      <tbody>
+        <tr><td>易方达沪深300ETF联接A</td><td>110020</td><td>2009</td><td>R4</td><td>7.24%</td><td><span class="badge bd-blue">推荐</span></td></tr>
+        <tr><td>华夏沪深300ETF联接A</td><td>000051</td><td>2009</td><td>R4</td><td>7.29%</td><td><span class="badge bd-blue">可选</span></td></tr>
+        <tr><td>华泰柏瑞沪深300ETF联接A</td><td>460300</td><td>2012</td><td>R4</td><td>7.02%</td><td><span class="badge bd-blue">可选</span></td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="asset-block">
+    <span class="a-tag equity">红利低波</span>
+    <h4>中证红利低波 ETF联接</h4>
+    <p class="a-logic">筛选逻辑：优先全市场选股（中证红利指数，100 只成分股）而非仅在沪深300内选（嘉实产品，约 50 只），分散度更高、回撤更低。</p>
+    <table><thead><tr><th>基金名称</th><th>代码</th><th>成立年份</th><th>风险</th><th>近1年回撤</th><th>评价</th></tr></thead>
+      <tbody>
+        <tr><td><strong>华泰柏瑞中证红利低波ETF联接A</strong></td><td>007466</td><td>2019</td><td>R4</td><td>7.38%</td><td><span class="badge bd-green">首选</span></td></tr>
+        <tr><td>嘉实沪深300红利低波ETF联接A</td><td>007605</td><td>2019</td><td>R4</td><td>7.67%</td><td><span class="badge bd-blue">备选</span></td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="asset-block">
+    <span class="a-tag gold">黄金</span>
+    <h4>黄金ETF联接</h4>
+    <p class="a-logic">筛选逻辑：跟踪 Au99.99 紧密、成立 &gt;5 年、规模大。<strong style="color:var(--red)">注意：黄金基金波动远超预期。</strong></p>
+    <table><thead><tr><th>基金名称</th><th>代码</th><th>成立年份</th><th>风险</th><th>近1年回撤</th><th>评价</th></tr></thead>
+      <tbody>
+        <tr><td>华安黄金ETF联接A</td><td>000216</td><td>2013</td><td>R4</td><td>25.07%</td><td><span class="badge bd-blue">成立最久</span></td></tr>
+        <tr><td>易方达黄金ETF联接C</td><td>002963</td><td>2016</td><td>R4</td><td>25.14%</td><td><span class="badge bd-blue">C类免申购费</span></td></tr>
+    </tbody></table>
+    <div class="warn-box">⚠ 两只黄金ETF联接近 1 年回撤均超 25%，远超同期沪深300（7%）和红利低波（7.4%）。黄金绝不等于"稳健"，组合中建议严控 15% 以内。</div>
+  </div>
+
+  <div class="asset-block">
+    <span class="a-tag bond">债券</span>
+    <h4>中短债 + 长债</h4>
+    <p class="a-logic">筛选逻辑：中短债优先（利率风险最小），长债少量增强。回撤差距显著：中短债 0.14–0.25% vs 长债 0.42–0.44%。</p>
+    <table><thead><tr><th>基金名称</th><th>代码</th><th>成立年份</th><th>风险</th><th>近1年回撤</th><th>类型</th></tr></thead>
+      <tbody>
+        <tr><td>工银尊益中短债C</td><td>485122</td><td>2013</td><td>R2</td><td>0.14%</td><td>中短债</td></tr>
+        <tr><td>建信中短债纯债A</td><td>006989</td><td>2019</td><td>R2</td><td>0.25%</td><td>中短债</td></tr>
+        <tr><td>国寿安保泰恒纯债</td><td>006980</td><td>2019</td><td>R2</td><td>0.42%</td><td>长债</td></tr>
+        <tr><td>易方达纯债债券A</td><td>110037</td><td>2012</td><td>R2</td><td>0.44%</td><td>长债</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="asset-block">
+    <span class="a-tag overseas">港股红利</span>
+    <h4>跨境分散</h4>
+    <p class="a-logic">筛选逻辑：港股 PE 12.27 vs A股沪深300 PE 14.79，估值折价明显。恒生红利低波提供 AH 分散。</p>
+    <table><thead><tr><th>基金名称</th><th>代码</th><th>成立年份</th><th>风险</th><th>近1年回撤</th><th>评价</th></tr></thead>
+      <tbody>
+        <tr><td>易方达恒生红利低波ETF联接A</td><td>021457</td><td>2024</td><td>R4</td><td>7.82%</td><td><span class="badge bd-gold">卫星仓位</span></td></tr>
+    </tbody></table>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ====== PORTFOLIOS ====== -->
+<section class="section" id="portfolios"><div class="container">
+  <div class="section-hd"><div class="sec-num">06 组合方案</div><h2>三套组合配置方案</h2><p class="desc">按风险偏好分三档，每套包含比例、人群、优劣势、再平衡规则及降仓信号</p></div>
+
+  <div class="pf-grid">
+    <div class="pf-card">
+      <div class="pf-hd cons"><div class="pf-icon">🛡️</div><h4>保守型</h4><div class="pf-sub">目标回撤 &lt;2% · 年化 2–4%</div></div>
+      <div class="pf-body">
+        <div class="pf-bar">
+          <div class="pf-bar-stack">
+            <div style="width:55%;background:var(--green)"></div>
+            <div style="width:15%;background:#34d399"></div>
+            <div style="width:15%;background:var(--accent)"></div>
+            <div style="width:10%;background:var(--gold)"></div>
+            <div style="width:5%;background:#d1d5db"></div>
+          </div>
+          <div class="pf-legend">
+            <span><span class="ld" style="background:var(--green)"></span>中短债 55%</span>
+            <span><span class="ld" style="background:#34d399"></span>长债 15%</span>
+            <span><span class="ld" style="background:var(--accent)"></span>红利 15%</span>
+            <span><span class="ld" style="background:var(--gold)"></span>黄金 10%</span>
+            <span><span class="ld" style="background:#d1d5db"></span>现金 5%</span>
+          </div>
+        </div>
+        <div class="pf-sec"><h5>适合人群</h5><p>退休 / 临近退休资金；1–3 年内有用款计划；无法承受本金亏损超 5%。</p></div>
+        <div class="pf-sec"><h5>核心优势</h5><p>债券占70%，波动极低；红利低波提供少量收益增强；黄金对冲通胀与极端风险。</p></div>
+        <div class="pf-sec"><h5>主要风险</h5><p>利率大幅上行冲击债券；长期收益可能跑输 CPI（当前 3.3%）。</p></div>
+        <div class="pf-sec"><h5>降仓信号</h5><p>债市转"雨"持续 3 日 → 长债降至 5%；黄金单月涨超 10% → 减半至 5%。</p></div>
+      </div>
+    </div>
+    <div class="pf-card">
+      <div class="pf-hd bal"><div class="pf-icon">⚖️</div><h4>稳健型</h4><div class="pf-sub">目标回撤 5–8% · 年化 4–7%</div></div>
+      <div class="pf-body">
+        <div class="pf-bar">
+          <div class="pf-bar-stack">
+            <div style="width:35%;background:var(--green)"></div>
+            <div style="width:10%;background:#34d399"></div>
+            <div style="width:25%;background:var(--accent)"></div>
+            <div style="width:15%;background:#374151"></div>
+            <div style="width:10%;background:var(--gold)"></div>
+            <div style="width:5%;background:#6d28d9"></div>
+          </div>
+          <div class="pf-legend">
+            <span><span class="ld" style="background:var(--green)"></span>中短债 35%</span>
+            <span><span class="ld" style="background:#34d399"></span>长债 10%</span>
+            <span><span class="ld" style="background:var(--accent)"></span>红利 25%</span>
+            <span><span class="ld" style="background:#374151"></span>沪深300 15%</span>
+            <span><span class="ld" style="background:var(--gold)"></span>黄金 10%</span>
+            <span><span class="ld" style="background:#6d28d9"></span>港股 5%</span>
+          </div>
+        </div>
+        <div class="pf-sec"><h5>适合人群</h5><p>3–5 年投资期限；可承受 10% 以内回撤；希望跑赢通胀的家庭资产。</p></div>
+        <div class="pf-sec"><h5>核心优势</h5><p>债券 45% 稳定基本盘；红利+沪深300合计 40%，兼顾防御与进攻；港股提供 AH 估值差弹性。</p></div>
+        <div class="pf-sec"><h5>主要风险</h5><p>沪深300 PE分位 99.8%，估值回归冲击；红利与沪深300同为A股，相关性约 0.7–0.8。</p></div>
+        <div class="pf-sec"><h5>降仓信号</h5><p>沪深300跌破 200 日均线 → 权益降至 25% 转入债券；黄金回撤破 30% → 黄金降至 5%。</p></div>
+      </div>
+    </div>
+    <div class="pf-card">
+      <div class="pf-hd agg"><div class="pf-icon">🚀</div><h4>进取型</h4><div class="pf-sub">目标回撤 &lt;12% · 年化 6–10%</div></div>
+      <div class="pf-body">
+        <div class="pf-bar">
+          <div class="pf-bar-stack">
+            <div style="width:25%;background:var(--green)"></div>
+            <div style="width:30%;background:var(--accent)"></div>
+            <div style="width:20%;background:#374151"></div>
+            <div style="width:10%;background:#6d28d9"></div>
+            <div style="width:10%;background:var(--gold)"></div>
+            <div style="width:5%;background:#d1d5db"></div>
+          </div>
+          <div class="pf-legend">
+            <span><span class="ld" style="background:var(--green)"></span>中短债 25%</span>
+            <span><span class="ld" style="background:var(--accent)"></span>红利 30%</span>
+            <span><span class="ld" style="background:#374151"></span>沪深300 20%</span>
+            <span><span class="ld" style="background:#6d28d9"></span>港股 10%</span>
+            <span><span class="ld" style="background:var(--gold)"></span>黄金 10%</span>
+            <span><span class="ld" style="background:#d1d5db"></span>现金 5%</span>
+          </div>
+        </div>
+        <div class="pf-sec"><h5>适合人群</h5><p>5 年以上投资期限；可承受 15% 回撤；年轻、有稳定现金流的进取型投资者。</p></div>
+        <div class="pf-sec"><h5>核心优势</h5><p>权益 60%（红利+沪深300+港股），弹性充足；红利低波替代部分沪深300，同等暴露下波动更低。</p></div>
+        <div class="pf-sec"><h5>主要风险</h5><p>A 股系统性下跌时回撤可达 10–12%；红利与沪深300极端环境可能同跌。</p></div>
+        <div class="pf-sec"><h5>降仓信号</h5><p>任一权益破 200 日均线 → 减半转入债券；组合回撤破 10% → 权益降至 40%，债券升至 50%。</p></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<div class="divider"></div>
+
+<!-- ====== CONCLUSION ====== -->
+<section class="section" id="conclusion"><div class="container">
+  <div class="section-hd"><div class="sec-num">07 结论</div><h2>最终结论</h2><p class="desc">综合 6 个 Skills 的全部数据，回答最初的研究问题</p></div>
+  <div class="conc-block">
+    <h3>五一节后，普通投资者更适合什么配置思路？</h3>
+    <p class="lead">以债券为底、红利为盾、宽基为矛、黄金为险。<br>不是猜方向——当前 A 股和黄金都处于历史高位，预测涨跌没有意义。而是做配置——通过不同资产的低相关性，在不确定中构建确定性。</p>
+    <div class="conc-grid">
+      <div class="conc-item"><h4>✅ 适合作为底仓</h4><p>中短债基金（回撤 0.1–0.3%，R2，债市晴好）— 组合基石。<br>红利低波 ETF（PE 8.75，股息缓冲）— 比沪深300更适合做权益底仓。</p></div>
+      <div class="conc-item"><h4>⚠️ 适合小比例增强</h4><p>沪深300 ETF（≤20%，PE分位 99.8%）<br>黄金 ETF（≤15%，近1年回撤 25%）<br>港股红利（≤10%，汇率+流动性风险）</p></div>
+      <div class="conc-item"><h4>🚫 不适合盲目追高</h4><p>黄金 ETF：历史高位，波动远超想象<br>近1年涨幅 &gt;50% 的赛道基金：高弹性 ≠ 低回撤<br>创业板 ETF（PE 45.9）：波动过大</p></div>
+      <div class="conc-item"><h4>📐 参考配置区间</h4><p>债券 45–70% / 红利低波 15–30%<br>宽基 0–20% / 黄金 10–15%<br>港股红利 0–10% / 现金 5%<br>具体比例取决于个人风险承受力</p></div>
+    </div>
+  </div>
+</div></section>
+
+</body>
+</html>
