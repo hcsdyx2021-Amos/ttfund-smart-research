@@ -181,11 +181,43 @@
   .divider{width:100%;height:1px;background:linear-gradient(to right,transparent,var(--border),transparent);margin:0}
 
   @media(max-width:768px){
-    .hero h1{font-size:26px}
+    .container{padding:0 16px}
+    .nav .container{padding:8px 16px;gap:0}
+    .nav a{font-size:11px;padding:5px 8px}
+    .hero{padding:36px 0 28px}
+    .hero h1{font-size:22px}
+    .hero .sub{font-size:14px;margin-bottom:22px}
+    .hero-meta{flex-wrap:wrap;gap:8px;font-size:11px}
+    .hero .summary{padding:16px 18px}
+    .summary p{font-size:12.5px}
+    .section{padding:32px 0}
+    .section-hd h2{font-size:21px}
+    .section-hd .desc{font-size:12.5px}
     .pf-grid,.findings-grid,.bg-grid,.skill-grid{grid-template-columns:1fr}
     .conclusion .c-grid{grid-template-columns:1fr}
-    .hero{padding:48px 0 36px}
-    .section{padding:36px 0}
+    .tl{padding-left:36px}
+    .tl-num{left:-36px;width:28px;height:28px;font-size:12px}
+    .tl::before{left:13px}
+    .tl-card{padding:16px 18px}
+    .skill-card{padding:16px}
+    .asset-block{padding:18px 16px}
+    .asset-block table{font-size:11px}
+    .asset-block th,.asset-block td{padding:6px 8px}
+    .pf-body{padding:14px 16px}
+    .pf-top{padding:20px 16px 14px}
+    .conclusion{padding:24px 20px}
+    .conclusion h3{font-size:16px}
+    .data-table{font-size:11px}
+    .data-table th,.data-table td{padding:8px 10px}
+    .find-card{padding:20px}
+    .pf-bar-legend{font-size:10px}
+  }
+  @media(max-width:480px){
+    .hero h1{font-size:19px}
+    .hero .sub{font-size:13px}
+    .hero-tags span{font-size:10px;padding:4px 10px}
+    .section-hd h2{font-size:18px}
+    .pf-bar-legend{gap:6px;font-size:9px}
   }
 </style>
 </head>
